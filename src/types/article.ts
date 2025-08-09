@@ -4,9 +4,9 @@ export interface Article {
   author: string;
   content: string;
   publishedDate: string;
-  views: number;
-  likes: number;
-  comments: number;
+  views?: number;
+  likes?: number;
+  comments?: number;
   status: 'Published' | 'Draft';
 }
 

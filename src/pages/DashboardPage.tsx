@@ -1,20 +1,24 @@
 import { useMemo, useState } from "react";
 import { mockArticles } from "../utils/mockData";
-import type { SortField, SortOrder } from "../types/article";
+import type { Article, SortField, SortOrder } from "../types/article";
 import {
   ArrowDownIcon,
   ArrowsUpDownIcon,
   ArrowUpIcon,
 } from "@heroicons/react/24/outline";
+import { EditArticleModal } from "../components/EditArticleModal";
+import { toast } from "react-toastify";
 
 export const DashboardPage = () => {
-  const [articles] = useState(mockArticles);
+  const [articles, setArticles] = useState(mockArticles);
   const [authorFilter, setAuthorFilter] = useState("");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
     null,
   ]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [sortField, setSortField] = useState<SortField>("publishedDate");
   const [sortDirection, setSortDirection] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,8 +62,8 @@ export const DashboardPage = () => {
         return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
       } else {
         return sortDirection === "asc"
-          ? a[sortField] - b[sortField]
-          : b[sortField] - a[sortField];
+          ? (a[sortField] ?? 0) - (b[sortField] ?? 0)
+          : (b[sortField] ?? 0) - (a[sortField] ?? 0);
       }
     });
     return sorted;
@@ -96,6 +100,22 @@ export const DashboardPage = () => {
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredAndSortedArticles.length / itemsPerPage);
+
+  // Add handler for edit button
+  const handleEdit = (article: Article) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+  };
+
+  // Handle save in modal
+  const handleSave = (updatedArticle: Article) => {
+    setArticles((prev) =>
+      prev.map((article) =>
+        article.id === updatedArticle.id ? updatedArticle : article
+      )
+    );
+    toast.success("Article updated successfully!");
+  };
 
   return (
     <div>
@@ -234,7 +254,10 @@ export const DashboardPage = () => {
                   {article.comments}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button className="text-indigo-600 hover:text-indigo-900">
+                  <button
+                    className="text-indigo-600 hover:text-indigo-900"
+                    onClick={() => handleEdit(article)}
+                  >
                     Edit
                   </button>
                 </td>
@@ -308,6 +331,12 @@ export const DashboardPage = () => {
           </div>
         </div>
       )}
+      <EditArticleModal
+        article={selectedArticle}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        isOpen={isModalOpen}
+      />
     </div>
   );
 };
