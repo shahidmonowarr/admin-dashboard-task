@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { mockArticles } from "../utils/mockData";
 import type { Article, SortField, SortOrder } from "../types/article";
 import {
   ArrowDownIcon,
@@ -11,10 +10,11 @@ import { toast } from "react-toastify";
 import { PerformanceChart } from "../components/PerformanceChart";
 import { useAuth } from "../context/AuthContext";
 import { useDebounce } from "../hooks/useDebounce";
+import { useArticles } from "../context/ArticleContest";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
-  const [articles, setArticles] = useState(mockArticles);
+  const { articles, updateArticle } = useArticles();
   const [authorFilter, setAuthorFilter] = useState("");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
@@ -117,11 +117,7 @@ export const DashboardPage = () => {
 
   // Handle save in modal
   const handleSave = (updatedArticle: Article) => {
-    setArticles((prev) =>
-      prev.map((article) =>
-        article.id === updatedArticle.id ? updatedArticle : article
-      )
-    );
+    updateArticle(updatedArticle);
     toast.success("Article updated successfully!");
   };
 

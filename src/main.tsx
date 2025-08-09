@@ -7,6 +7,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import { ArticlesProvider } from "./context/ArticleContest";
 
 const router = createBrowserRouter([
   {
@@ -32,7 +33,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <ArticlesProvider>
+        <RouterProvider router={router} />
+      </ArticlesProvider>
     </AuthProvider>
   </React.StrictMode>
 );
