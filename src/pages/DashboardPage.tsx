@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { useArticles } from "../context/ArticleContest";
 import { exportToCSV } from "../utils/exportUtils";
+import { FiltersSection } from "../components/FilterSection";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -99,6 +100,11 @@ export const DashboardPage = () => {
     );
   };
 
+  // Handle clearing all filters
+  const handleClearAllFilters = () => {
+    setCurrentPage(1); // Reset to first page when clearing filters
+  };
+
   // Calculate paginated data
   const paginatedArticles = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -154,87 +160,19 @@ export const DashboardPage = () => {
         </button>
       </div>
 
-      {/* Filters Section */}
-      <div className="mb-6 bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search Input */}
-          <div>
-            <label
-              htmlFor="search"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Search by Title
-            </label>
-            <input
-              type="text"
-              id="search"
-              className="w-full rounded-md px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      {/* Modern Filters Section */}
+      <FiltersSection
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        authorFilter={authorFilter}
+        setAuthorFilter={setAuthorFilter}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        authors={authors}
+        filteredCount={filteredAndSortedArticles.length}
+        onClearAll={handleClearAllFilters}
+      />
 
-          {/* Author Filter */}
-          <div>
-            <label
-              htmlFor="author"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Filter by Author
-            </label>
-            <select
-              id="author"
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              value={authorFilter}
-              onChange={(e) => setAuthorFilter(e.target.value)}
-            >
-              <option value="">All Authors</option>
-              {authors.map((author) => (
-                <option key={author} value={author}>
-                  {author}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Date Range Filter */}
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date Range
-            </label>
-            <div className="flex space-x-2">
-              <input
-                type="date"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                onChange={(e) =>
-                  setDateRange([
-                    e.target.value ? new Date(e.target.value) : null,
-                    dateRange[1],
-                  ])
-                }
-              />
-              <span className="flex items-center">to</span>
-              <input
-                type="date"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                onChange={(e) =>
-                  setDateRange([
-                    dateRange[0],
-                    e.target.value ? new Date(e.target.value) : null,
-                  ])
-                }
-              />
-              <button
-                className="px-3 py-1 bg-gray-200 rounded-md text-sm"
-                onClick={() => setDateRange([null, null])}
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
       {isCardView ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {paginatedArticles.map((article) => (
