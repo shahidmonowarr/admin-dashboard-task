@@ -60,7 +60,7 @@ export const PerformanceChart = ({
   }, [articles, viewMode]);
 
   return (
-    <div className="mt-8 bg-white p-4 rounded-lg shadow">
+    <div className="mt-4 bg-white p-4 rounded-lg shadow">
       <h3 className="text-lg font-medium mb-4">Article Performance</h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">

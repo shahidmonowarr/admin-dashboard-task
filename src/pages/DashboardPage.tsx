@@ -335,7 +335,7 @@ export const DashboardPage = () => {
       )}
 
       {/* Performance Chart */}
-      <div className="flex justify-end mb-2">
+      <div className="flex justify-end mt-4">
         <div className="inline-flex rounded-md shadow-sm">
           <button
             onClick={() => setViewMode("daily")}
