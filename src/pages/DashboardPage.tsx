@@ -30,6 +30,7 @@ export const DashboardPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [viewMode, setViewMode] = useState<"daily" | "monthly">("daily");
+  const [isCardView, setIsCardView] = useState(false);
 
   // Get unique authors
   const authors = useMemo(() => {
@@ -145,6 +146,12 @@ export const DashboardPage = () => {
         >
           Export to CSV
         </button>
+        <button
+          onClick={() => setIsCardView(!isCardView)}
+          className="p-2 bg-gray-200 rounded-md"
+        >
+          {isCardView ? "Table View" : "Card View"}
+        </button>
       </div>
 
       {/* Filters Section */}
@@ -228,72 +235,98 @@ export const DashboardPage = () => {
           </div>
         </div>
       </div>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Author
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Published Date
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort("views")}
-              >
-                Views {renderSortIcon("views")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Likes
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Comments
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedArticles.map((article) => (
-              <tr key={article.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {article.title}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {article.author}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(article.publishedDate).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {article.views}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {article.likes}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {article.comments}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {user?.role === "admin" && (
-                    <button
-                      className="text-indigo-600 hover:text-indigo-900"
-                      onClick={() => handleEdit(article)}
-                    >
-                      Edit
-                    </button>
-                  )}
-                </td>
+      {isCardView ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {paginatedArticles.map((article) => (
+            <div key={article.id} className="bg-white p-4 rounded-lg shadow">
+              <div className="flex justify-between">
+                <h3 className="font-medium">{article.title}</h3>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">{article.author}</p>
+              <div className="flex justify-between text-sm mt-2">
+                <span>👁️ {article.views}</span>
+                <span>👍 {article.likes}</span>
+                <span>💬 {article.comments}</span>
+              </div>
+              {user?.role === "admin" && (
+                <button
+                  onClick={() => handleEdit(article)}
+                  className="mt-2 text-sm text-indigo-600"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Title
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Author
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Published Date
+                </th>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("views")}
+                >
+                  Views {renderSortIcon("views")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Likes
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Comments
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {paginatedArticles.map((article) => (
+                <tr key={article.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {article.title}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {article.author}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(article.publishedDate).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {article.views}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {article.likes}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {article.comments}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {user?.role === "admin" && (
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900"
+                        onClick={() => handleEdit(article)}
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
