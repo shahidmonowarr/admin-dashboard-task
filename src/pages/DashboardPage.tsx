@@ -10,6 +10,7 @@ import { EditArticleModal } from "../components/EditArticleModal";
 import { toast } from "react-toastify";
 import { PerformanceChart } from "../components/PerformanceChart";
 import { useAuth } from "../context/AuthContext";
+import { useDebounce } from "../hooks/useDebounce";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export const DashboardPage = () => {
     null,
   ]);
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce<string>(searchQuery, 300);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [sortField, setSortField] = useState<SortField>("publishedDate");
@@ -47,15 +49,17 @@ export const DashboardPage = () => {
 
       // Filter by search query
       if (
-        searchQuery &&
-        !article.title.toLowerCase().includes(searchQuery.toLowerCase())
+        debouncedSearchQuery &&
+        !article.title
+          .toLowerCase()
+          .includes(debouncedSearchQuery.toLowerCase())
       ) {
         return false;
       }
 
       return true;
     });
-  }, [articles, authorFilter, dateRange, searchQuery]);
+  }, [articles, authorFilter, dateRange, debouncedSearchQuery]);
 
   // Sort articles
   const filteredAndSortedArticles = useMemo(() => {
@@ -139,7 +143,7 @@ export const DashboardPage = () => {
             <input
               type="text"
               id="search"
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="w-full rounded-md px-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder="Search articles..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
