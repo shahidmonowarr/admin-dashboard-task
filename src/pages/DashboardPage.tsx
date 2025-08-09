@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
 import { mockArticles } from "../utils/mockData";
+import type { SortField, SortOrder } from "../types/article";
+import {
+  ArrowDownIcon,
+  ArrowsUpDownIcon,
+  ArrowUpIcon,
+} from "@heroicons/react/24/outline";
 
 export const DashboardPage = () => {
   const [articles] = useState(mockArticles);
@@ -9,6 +15,8 @@ export const DashboardPage = () => {
     null,
   ]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState<SortField>("publishedDate");
+  const [sortDirection, setSortDirection] = useState<SortOrder>("desc");
 
   // Get unique authors
   const authors = useMemo(() => {
@@ -38,6 +46,42 @@ export const DashboardPage = () => {
       return true;
     });
   }, [articles, authorFilter, dateRange, searchQuery]);
+
+  // Sort articles
+  const filteredAndSortedArticles = useMemo(() => {
+    const sorted = [...filteredArticles].sort((a, b) => {
+      if (sortField === "publishedDate") {
+        const dateA = new Date(a.publishedDate).getTime();
+        const dateB = new Date(b.publishedDate).getTime();
+        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      } else {
+        return sortDirection === "asc"
+          ? a[sortField] - b[sortField]
+          : b[sortField] - a[sortField];
+      }
+    });
+    return sorted;
+  }, [filteredArticles, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
+  // Render sort icon based on current sort field and direction
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field)
+      return <ArrowsUpDownIcon className="h-4 w-4 inline ml-1" />;
+    return sortDirection === "asc" ? (
+      <ArrowUpIcon className="h-4 w-4 inline ml-1" />
+    ) : (
+      <ArrowDownIcon className="h-4 w-4 inline ml-1" />
+    );
+  };
 
   return (
     <div>
@@ -137,8 +181,11 @@ export const DashboardPage = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Published Date
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Views
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort("views")}
+              >
+                Views {renderSortIcon("views")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Likes
@@ -152,7 +199,7 @@ export const DashboardPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredArticles.map((article) => (
+            {filteredAndSortedArticles.map((article) => (
               <tr key={article.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {article.title}
