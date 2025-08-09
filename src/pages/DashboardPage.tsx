@@ -9,8 +9,10 @@ import {
 import { EditArticleModal } from "../components/EditArticleModal";
 import { toast } from "react-toastify";
 import { PerformanceChart } from "../components/PerformanceChart";
+import { useAuth } from "../context/AuthContext";
 
 export const DashboardPage = () => {
+  const { user } = useAuth();
   const [articles, setArticles] = useState(mockArticles);
   const [authorFilter, setAuthorFilter] = useState("");
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
@@ -256,12 +258,14 @@ export const DashboardPage = () => {
                   {article.comments}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button
-                    className="text-indigo-600 hover:text-indigo-900"
-                    onClick={() => handleEdit(article)}
-                  >
-                    Edit
-                  </button>
+                  {user?.role === "admin" && (
+                    <button
+                      className="text-indigo-600 hover:text-indigo-900"
+                      onClick={() => handleEdit(article)}
+                    >
+                      Edit
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -359,7 +363,7 @@ export const DashboardPage = () => {
           </button>
         </div>
       </div>
-      
+
       <PerformanceChart
         articles={filteredAndSortedArticles.map(
           ({ publishedDate, views, likes, comments }) => ({
