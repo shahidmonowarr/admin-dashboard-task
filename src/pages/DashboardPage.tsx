@@ -11,6 +11,7 @@ import { PerformanceChart } from "../components/PerformanceChart";
 import { useAuth } from "../context/AuthContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { useArticles } from "../context/ArticleContest";
+import { exportToCSV } from "../utils/exportUtils";
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -123,7 +124,28 @@ export const DashboardPage = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Articles</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Articles</h2>
+        <button
+          onClick={() =>
+            exportToCSV(
+              filteredAndSortedArticles.map((article) => ({
+                Title: article.title,
+                Author: article.author,
+                "Published Date": article.publishedDate,
+                Views: article.views,
+                Likes: article.likes,
+                Comments: article.comments,
+                Status: article.status,
+              })),
+              `articles-${new Date().toISOString().slice(0, 10)}`
+            )
+          }
+          className="px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700"
+        >
+          Export to CSV
+        </button>
+      </div>
 
       {/* Filters Section */}
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
