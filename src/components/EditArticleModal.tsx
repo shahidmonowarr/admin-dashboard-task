@@ -127,8 +127,8 @@ export const EditArticleModal = ({
                 </Dialog.Title>
 
                 {activeTab === "edit" ? (
-                  <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-                    <div>
+                  <form onSubmit={handleSubmit} className="mt-4 space-y-6">
+                    <div className="px-2">
                       <label
                         htmlFor="title"
                         className="block text-sm font-medium text-gray-700"
@@ -141,7 +141,7 @@ export const EditArticleModal = ({
                         name="title"
                         className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
                           errors.title ? "border-red-500" : ""
-                        }`}
+                        } py-2 px-3`}
                         value={formData.title}
                         onChange={handleChange}
                       />
@@ -152,7 +152,7 @@ export const EditArticleModal = ({
                       )}
                     </div>
 
-                    <div>
+                    <div className="px-2">
                       <label
                         htmlFor="content"
                         className="block text-sm font-medium text-gray-700"
@@ -165,7 +165,7 @@ export const EditArticleModal = ({
                         rows={4}
                         className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
                           errors.content ? "border-red-500" : ""
-                        }`}
+                        } py-2 px-3`}
                         value={formData.content}
                         onChange={handleChange}
                       />
@@ -176,7 +176,7 @@ export const EditArticleModal = ({
                       )}
                     </div>
 
-                    <div>
+                    <div className="px-2">
                       <label
                         htmlFor="status"
                         className="block text-sm font-medium text-gray-700"
@@ -186,7 +186,7 @@ export const EditArticleModal = ({
                       <select
                         id="status"
                         name="status"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3"
                         value={formData.status}
                         onChange={handleChange}
                       >
@@ -195,7 +195,7 @@ export const EditArticleModal = ({
                       </select>
                     </div>
 
-                    <div className="flex justify-end space-x-3 pt-4">
+                    <div className="flex justify-end space-x-3 pt-4 px-2">
                       <button
                         type="button"
                         className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
