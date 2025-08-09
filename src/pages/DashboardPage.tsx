@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { EditArticleModal } from "../components/EditArticleModal";
 import { toast } from "react-toastify";
+import { PerformanceChart } from "../components/PerformanceChart";
 
 export const DashboardPage = () => {
   const [articles, setArticles] = useState(mockArticles);
@@ -23,6 +24,7 @@ export const DashboardPage = () => {
   const [sortDirection, setSortDirection] = useState<SortOrder>("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [viewMode, setViewMode] = useState<"daily" | "monthly">("daily");
 
   // Get unique authors
   const authors = useMemo(() => {
@@ -331,6 +333,45 @@ export const DashboardPage = () => {
           </div>
         </div>
       )}
+
+      {/* Performance Chart */}
+      <div className="flex justify-end mb-2">
+        <div className="inline-flex rounded-md shadow-sm">
+          <button
+            onClick={() => setViewMode("daily")}
+            className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+              viewMode === "daily"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            Daily
+          </button>
+          <button
+            onClick={() => setViewMode("monthly")}
+            className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
+              viewMode === "monthly"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            Monthly
+          </button>
+        </div>
+      </div>
+      
+      <PerformanceChart
+        articles={filteredAndSortedArticles.map(
+          ({ publishedDate, views, likes, comments }) => ({
+            publishedDate,
+            views: views ?? 0,
+            likes: likes ?? 0,
+            comments: comments ?? 0,
+          })
+        )}
+        viewMode={viewMode}
+      />
+
       <EditArticleModal
         article={selectedArticle}
         onClose={() => setIsModalOpen(false)}
