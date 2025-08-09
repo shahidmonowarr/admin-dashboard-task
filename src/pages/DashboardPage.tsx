@@ -1,12 +1,129 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { mockArticles } from "../utils/mockData";
 
 export const DashboardPage = () => {
   const [articles] = useState(mockArticles);
+  const [authorFilter, setAuthorFilter] = useState("");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Get unique authors
+  const authors = useMemo(() => {
+    const uniqueAuthors = new Set(articles.map((article) => article.author));
+    return Array.from(uniqueAuthors).sort();
+  }, [articles]);
+
+  // Filter articles
+  const filteredArticles = useMemo(() => {
+    return articles.filter((article) => {
+      // Filter by author
+      if (authorFilter && article.author !== authorFilter) return false;
+
+      // Filter by date range
+      const articleDate = new Date(article.publishedDate);
+      if (dateRange[0] && articleDate < dateRange[0]) return false;
+      if (dateRange[1] && articleDate > dateRange[1]) return false;
+
+      // Filter by search query
+      if (
+        searchQuery &&
+        !article.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [articles, authorFilter, dateRange, searchQuery]);
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Articles</h2>
+
+      {/* Filters Section */}
+      <div className="mb-6 bg-white p-4 rounded-lg shadow">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search Input */}
+          <div>
+            <label
+              htmlFor="search"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Search by Title
+            </label>
+            <input
+              type="text"
+              id="search"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* Author Filter */}
+          <div>
+            <label
+              htmlFor="author"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Filter by Author
+            </label>
+            <select
+              id="author"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={authorFilter}
+              onChange={(e) => setAuthorFilter(e.target.value)}
+            >
+              <option value="">All Authors</option>
+              {authors.map((author) => (
+                <option key={author} value={author}>
+                  {author}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date Range Filter */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date Range
+            </label>
+            <div className="flex space-x-2">
+              <input
+                type="date"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                onChange={(e) =>
+                  setDateRange([
+                    e.target.value ? new Date(e.target.value) : null,
+                    dateRange[1],
+                  ])
+                }
+              />
+              <span className="flex items-center">to</span>
+              <input
+                type="date"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                onChange={(e) =>
+                  setDateRange([
+                    dateRange[0],
+                    e.target.value ? new Date(e.target.value) : null,
+                  ])
+                }
+              />
+              <button
+                className="px-3 py-1 bg-gray-200 rounded-md text-sm"
+                onClick={() => setDateRange([null, null])}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -35,7 +152,7 @@ export const DashboardPage = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <tr key={article.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {article.title}
